@@ -1,0 +1,6 @@
+@EstiadorAPI_HostAddress = http://localhost:5172
+
+GET {{EstiadorAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

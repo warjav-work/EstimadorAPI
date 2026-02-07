@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="EstimadorAPI.API/EstimadorAPI.API.csproj" Id="aad30537-b70b-4ad9-976a-0c0f88c4e919" />
+  <Project Path="EstimadorAPI.Application/EstimadorAPI.Application.csproj" Id="7f13e8e6-6fbf-4c6d-a3d8-5bac97268566" />
+  <Project Path="EstimadorAPI.Domain/EstimadorAPI.Domain.csproj" Id="d1d413df-3af0-4ef6-868c-a1dfaf3949b0" />
+  <Project Path="EstimadorAPI.Infrastructure/EstimadorAPI.Infrastructure.csproj" Id="0bd86560-96cf-4247-812c-ea3a1c5ad94e" />
+</Solution>
