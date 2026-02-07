@@ -27,7 +27,11 @@ public class EstimadorDbContext(DbContextOptions<EstimadorDbContext> options) : 
             entity.Property(e => e.Description).IsRequired().HasMaxLength(500);
             entity.Property(e => e.ClientName).HasMaxLength(100);
             entity.HasIndex(e => e.Code).IsUnique();
-            entity.HasMany(e => e.UseCases).WithOne(e => e.Project).HasForeignKey(e => e.ProjectId).OnDelete(DeleteBehavior.Cascade);
+            // Usar NoAction para evitar ciclos
+            entity.HasMany(e => e.UseCases)
+                .WithOne(e => e.Project)
+                .HasForeignKey(e => e.ProjectId)
+                .OnDelete(DeleteBehavior.NoAction);
         });
 
         // UseCase configuration
@@ -40,10 +44,27 @@ public class EstimadorDbContext(DbContextOptions<EstimadorDbContext> options) : 
             entity.Property(e => e.Preconditions).HasMaxLength(500);
             entity.Property(e => e.Postconditions).HasMaxLength(500);
             entity.HasIndex(e => new { e.ProjectId, e.Code }).IsUnique();
-            entity.HasMany(e => e.Actors).WithOne(e => e.UseCase).HasForeignKey(e => e.UseCaseId).OnDelete(DeleteBehavior.Cascade);
-            entity.HasMany(e => e.Steps).WithOne(e => e.UseCase).HasForeignKey(e => e.UseCaseId).OnDelete(DeleteBehavior.Cascade);
-            entity.HasMany(e => e.Requirements).WithOne(e => e.UseCase).HasForeignKey(e => e.UseCaseId).OnDelete(DeleteBehavior.Cascade);
-            entity.HasOne(e => e.EstimationResult).WithOne(e => e.UseCase).HasForeignKey<EstimationResult>(e => e.UseCaseId).OnDelete(DeleteBehavior.Cascade);
+
+            // Usar NoAction en todas las relaciones que puedan crear ciclos
+            entity.HasMany(e => e.Actors)
+                .WithOne(e => e.UseCase)
+                .HasForeignKey(e => e.UseCaseId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            entity.HasMany(e => e.Steps)
+                .WithOne(e => e.UseCase)
+                .HasForeignKey(e => e.UseCaseId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            entity.HasMany(e => e.Requirements)
+                .WithOne(e => e.UseCase)
+                .HasForeignKey(e => e.UseCaseId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            entity.HasOne(e => e.EstimationResult)
+                .WithOne(e => e.UseCase)
+                .HasForeignKey<EstimationResult>(e => e.UseCaseId)
+                .OnDelete(DeleteBehavior.NoAction);
         });
 
         // Actor configuration
@@ -59,8 +80,16 @@ public class EstimadorDbContext(DbContextOptions<EstimadorDbContext> options) : 
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Description).IsRequired().HasMaxLength(300);
-            entity.HasOne(e => e.ResponsibleActor).WithMany().HasForeignKey(e => e.ResponsibleActorId).OnDelete(DeleteBehavior.SetNull);
-            entity.HasMany(e => e.Requirements).WithOne(e => e.UseCaseStep).HasForeignKey(e => e.UseCaseStepId).OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(e => e.ResponsibleActor)
+                .WithMany()
+                .HasForeignKey(e => e.ResponsibleActorId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasMany(e => e.Requirements)
+                .WithOne(e => e.UseCaseStep)
+                .HasForeignKey(e => e.UseCaseStepId)
+                .OnDelete(DeleteBehavior.SetNull);
         });
 
         // FunctionalRequirement configuration
@@ -71,16 +100,46 @@ public class EstimadorDbContext(DbContextOptions<EstimadorDbContext> options) : 
             entity.Property(e => e.Title).IsRequired().HasMaxLength(150);
             entity.Property(e => e.Description).IsRequired().HasMaxLength(500);
             entity.HasIndex(e => new { e.UseCaseId, e.Code }).IsUnique();
-            entity.HasMany(e => e.Dependencies).WithOne(e => e.Requirement).HasForeignKey(e => e.RequirementId).OnDelete(DeleteBehavior.Cascade);
-            entity.HasMany(e => e.DependentOn).WithOne(e => e.DependsOnRequirement).HasForeignKey(e => e.DependsOnRequirementId).OnDelete(DeleteBehavior.NoAction);
+
+            // Usar NoAction para la relación con UseCase
+            entity.HasOne(e => e.UseCase)
+                .WithMany(e => e.Requirements)
+                .HasForeignKey(e => e.UseCaseId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            // Usar SetNull para la relación con UseCaseStep
+            entity.HasOne(e => e.UseCaseStep)
+                .WithMany(e => e.Requirements)
+                .HasForeignKey(e => e.UseCaseStepId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            // Usar NoAction para evitar ciclos de dependencias
+            entity.HasMany(e => e.Dependencies)
+                .WithOne(e => e.Requirement)
+                .HasForeignKey(e => e.RequirementId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            entity.HasMany(e => e.DependentOn)
+                .WithOne(e => e.DependsOnRequirement)
+                .HasForeignKey(e => e.DependsOnRequirementId)
+                .OnDelete(DeleteBehavior.NoAction);
         });
 
         // RequirementDependency configuration
         modelBuilder.Entity<RequirementDependency>(entity =>
         {
             entity.HasKey(e => e.Id);
-            entity.HasOne(e => e.Requirement).WithMany(e => e.Dependencies).HasForeignKey(e => e.RequirementId).OnDelete(DeleteBehavior.Cascade);
-            entity.HasOne(e => e.DependsOnRequirement).WithMany(e => e.DependentOn).HasForeignKey(e => e.DependsOnRequirementId).OnDelete(DeleteBehavior.NoAction);
+
+            entity.HasOne(e => e.Requirement)
+                .WithMany(e => e.Dependencies)
+                .HasForeignKey(e => e.RequirementId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            entity.HasOne(e => e.DependsOnRequirement)
+                .WithMany(e => e.DependentOn)
+                .HasForeignKey(e => e.DependsOnRequirementId)
+                .OnDelete(DeleteBehavior.NoAction);
+
             entity.HasIndex(e => new { e.RequirementId, e.DependsOnRequirementId }).IsUnique();
         });
 
@@ -89,6 +148,11 @@ public class EstimadorDbContext(DbContextOptions<EstimadorDbContext> options) : 
         {
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => e.UseCaseId).IsUnique();
+
+            entity.HasOne(e => e.UseCase)
+                .WithOne(e => e.EstimationResult)
+                .HasForeignKey<EstimationResult>(e => e.UseCaseId)
+                .OnDelete(DeleteBehavior.NoAction);
         });
     }
 

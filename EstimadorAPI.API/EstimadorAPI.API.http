@@ -1,6 +1,11 @@
-@EstimadorAPI.API_HostAddress = http://localhost:5078
+@EstimadorAPI.API_HostAddress = http://localhost:5000
 
 GET {{EstimadorAPI.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
+
+GET {{EstimadorAPI.API_HostAddress}}/api/Projects
 Accept: application/json
 
 ###

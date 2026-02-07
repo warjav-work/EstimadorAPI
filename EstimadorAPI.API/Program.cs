@@ -1,8 +1,6 @@
 using EstimadorAPI.Application;
 using EstimadorAPI.Infrastructure;
-using FluentValidation;
-using Microsoft.OpenApi;
-using Microsoft.OpenApi.Models;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,28 +17,6 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-// Agregar Swagger/OpenAPI
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Title = "Estimator API",
-        Version = "v1.0",
-        Description = "API para estimación de requisitos funcionales de casos de uso",
-        Contact = new OpenApiContact
-        {
-            Name = "Estimator Team",
-            Email = "estimator@example.com"
-        }
-    });
-
-    // Incluir comentarios XML
-    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    if (File.Exists(xmlPath))
-        c.IncludeXmlComments(xmlPath);
-});
 
 // Agregar CORS
 builder.Services.AddCors(options =>
@@ -60,12 +36,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Estimator API v1");
-        c.RoutePrefix = string.Empty;
-    });
+    app.MapScalarApiReference();
 }
 
 app.UseHttpsRedirection();

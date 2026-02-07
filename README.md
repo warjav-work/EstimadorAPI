@@ -38,7 +38,7 @@ API REST completa para la estimación automática de requisitos funcionales de c
 
 ```
 EstimadorAPI/
-├── EstimadorAPI/                           # Capa de Presentación (API)
+├── EstimadorAPI.API/                       # Capa de Presentación (API)
 │   ├── Controllers/
 │   │   ├── ProjectsController.cs
 │   │   └── UseCasesController.cs
@@ -388,8 +388,8 @@ MIT
 
 ## 👨‍💻 Autor
 
-Estimador Team
+Estimador Team warjav-work
 
 ## 📧 Contacto
 
-Para soporte o sugerencias, contacta a Estimador@example.com
+Para soporte o sugerencias, contacta a warjav.work@gmail.com
