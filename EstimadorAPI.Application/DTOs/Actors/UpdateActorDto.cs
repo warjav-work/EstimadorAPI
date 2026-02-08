@@ -2,12 +2,10 @@
 
 namespace EstimadorAPI.Application.DTOs.Actors
 {
-    public class ActorDto
+    public class UpdateActorDto
     {
-        public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public ActorType Type { get; set; }
-        public string Description { get; set; } = string.Empty;
-        public int UseCaseId { get; set; }
+        public string Description { get; set; } = string.Empty;       
     }
 }
